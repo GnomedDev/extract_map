@@ -286,6 +286,19 @@ where
     }
 }
 
+impl<K, V, S> Extend<V> for ExtractMap<K, V, S>
+where
+    K: Hash + Eq,
+    V: ExtractKey<K>,
+    S: BuildHasher,
+{
+    fn extend<T: IntoIterator<Item = V>>(&mut self, iter: T) {
+        for item in iter {
+            self.insert(item);
+        }
+    }
+}
+
 /// Deserializes an [`ExtractMap`] from either a sequence or a map.
 ///
 /// This uses [`serde::Deserializer::deserialize_any`], so may fail for formats which are not self-describing.
