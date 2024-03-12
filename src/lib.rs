@@ -8,9 +8,11 @@ use std::{
     marker::PhantomData,
 };
 
+use mut_guard::MutGuard;
 use value_wrapper::ValueWrapper;
 
 pub mod iter;
+mod mut_guard;
 mod value_wrapper;
 
 pub trait ExtractKey<K> {
@@ -179,6 +181,21 @@ where
     #[must_use]
     pub fn get(&self, key: &K) -> Option<&V> {
         self.inner.get(key).map(|v| &v.0)
+    }
+
+    /// Retrieves a mutable guard to a value in the [`ExtractMap`].
+    ///
+    /// This will retrieve the value based on the key extracted using [`ExtractKey`].
+    ///
+    /// This guard is required as the current implementation takes the value out
+    /// of the map and reinserts on Drop to allow mutation of the key field.
+    #[must_use]
+    pub fn get_mut<'a>(&'a mut self, key: &K) -> Option<MutGuard<'a, K, V, S>> {
+        let value = self.inner.take(key)?;
+        Some(MutGuard {
+            value: Some(value.0),
+            map: self,
+        })
     }
 }
 
