@@ -99,7 +99,7 @@ impl<K, V, S> ExtractMap<K, V, S> {
     ///
     /// let map = ExtractMap::<u64, User>::with_capacity_and_hasher(5, std::hash::RandomState::new());
     ///
-    /// assert_eq!(map.len(), 0);
+    /// assert!(map.is_empty());
     /// assert!(map.capacity() >= 5);
     /// ```
     #[must_use]
@@ -145,16 +145,39 @@ where
         self.inner.insert(ValueWrapper(value, PhantomData), ());
     }
 
+    /// # Examples
+    /// ```
+    /// use extract_map::{ExtractMap, ExtractKey};
+    ///
+    /// #[derive(Debug, Clone, PartialEq)]
+    /// struct User {
+    ///     id: u64,
+    ///     name: &'static str,
+    /// }
+    ///
+    /// impl ExtractKey<u64> for User {
+    ///     fn extract_key(&self) -> &u64 {
+    ///         &self.id
+    ///     }
+    /// }
+    ///
+    /// let user = User { id: 1, name: "Daisy" };
+    /// let mut map = ExtractMap::new();
+    /// map.insert(user.clone());
+    ///
+    /// assert_eq!(map.remove(&1), Some(user));
+    /// assert!(map.is_empty())
+    /// ```
+    pub fn remove(&mut self, key: &K) -> Option<V> {
+        self.inner.remove_entry(key).map(|(v, ())| v.0)
+    }
+
     /// Retrieves a value from the [`ExtractMap`].
     ///
     /// This will retrieve the value based on the key extracted using [`ExtractKey`].
     #[must_use]
     pub fn get(&self, key: &K) -> Option<&V> {
-        let hash = self.inner.hasher().hash_one(key);
-        self.inner
-            .raw_entry()
-            .from_hash(hash, |v| v.0.extract_key() == key)
-            .map(|(v, ())| &v.0)
+        self.inner.get_key_value(key).map(|(v, ())| &v.0)
     }
 }
 

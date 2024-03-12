@@ -1,8 +1,17 @@
-use std::{hash::Hash, marker::PhantomData};
+use std::{borrow::Borrow, hash::Hash, marker::PhantomData};
 
 use crate::ExtractKey;
 
 pub(crate) struct ValueWrapper<K, V>(pub V, pub PhantomData<K>);
+
+impl<K, V> Borrow<K> for ValueWrapper<K, V>
+where
+    V: ExtractKey<K>,
+{
+    fn borrow(&self) -> &K {
+        self.0.extract_key()
+    }
+}
 
 impl<K, V> Hash for ValueWrapper<K, V>
 where
