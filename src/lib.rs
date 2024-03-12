@@ -248,6 +248,22 @@ where
     }
 }
 
+impl<K, V, S> FromIterator<V> for ExtractMap<K, V, S>
+where
+    K: Eq + Hash,
+    V: ExtractKey<K>,
+    S: BuildHasher + Default,
+{
+    fn from_iter<T: IntoIterator<Item = V>>(iter: T) -> Self {
+        let inner = iter
+            .into_iter()
+            .map(|item| (ValueWrapper(item, PhantomData), ()))
+            .collect();
+
+        Self { inner }
+    }
+}
+
 /// Deserializes an [`ExtractMap`] from either a sequence or a map.
 ///
 /// This uses [`serde::Deserializer::deserialize_any`], so may fail for formats which are not self-describing.
