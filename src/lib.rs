@@ -148,6 +148,8 @@ where
             .map(|v| v.0)
     }
 
+    /// Removes a value from the [`ExtractMap`].
+    ///
     /// # Examples
     /// ```
     /// use extract_map::{ExtractMap, ExtractKey};
@@ -175,17 +177,19 @@ where
         self.inner.take(key).map(|v| v.0)
     }
 
+    /// Checks if a value is in the [`ExtractMap`].
+    #[must_use]
+    pub fn contains_key(&self, key: &K) -> bool {
+        self.inner.contains(key)
+    }
+
     /// Retrieves a value from the [`ExtractMap`].
-    ///
-    /// This will retrieve the value based on the key extracted using [`ExtractKey`].
     #[must_use]
     pub fn get(&self, key: &K) -> Option<&V> {
         self.inner.get(key).map(|v| &v.0)
     }
 
     /// Retrieves a mutable guard to a value in the [`ExtractMap`].
-    ///
-    /// This will retrieve the value based on the key extracted using [`ExtractKey`].
     ///
     /// This guard is required as the current implementation takes the value out
     /// of the map and reinserts on Drop to allow mutation of the key field.
