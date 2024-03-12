@@ -2,12 +2,11 @@
 #![forbid(unsafe_code)]
 
 use std::{
+    collections::HashSet,
     fmt::Debug,
     hash::{BuildHasher, Hash, RandomState},
     marker::PhantomData,
 };
-
-use hashbrown::HashMap;
 
 use value_wrapper::ValueWrapper;
 
@@ -21,13 +20,13 @@ pub trait ExtractKey<K> {
 /// A hash map for memory efficent storage of value types which contain their own keys.
 ///
 /// This is achieved by the `V` type deriving the [`ExtractKey`] trait for their `K` type,
-/// and is backed by a `hashbrown::HashMap<Wrap<K>, V, S>`, meaning this library is `#![forbid(unsafe_code)]`.
+/// and is backed by a `HashSet<Wrap<K>, V, S>`, meaning this library is `#![forbid(unsafe_code)]`.
 ///
 /// The default hashing algorithm is the same as the standard library's [`HashMap`], [`RandomState`],
 /// although your own hasher can be provided via [`ExtractMap::with_hasher`] and it's similar methods.
 #[cfg_attr(feature = "typesize", derive(typesize::TypeSize))]
 pub struct ExtractMap<K, V, S = RandomState> {
-    inner: HashMap<ValueWrapper<K, V>, (), S>,
+    inner: HashSet<ValueWrapper<K, V>, S>,
 }
 
 impl<K, V> Default for ExtractMap<K, V, RandomState> {
@@ -76,7 +75,7 @@ impl<K, V, S> ExtractMap<K, V, S> {
     #[must_use]
     pub fn with_hasher(hasher: S) -> Self {
         Self {
-            inner: HashMap::with_hasher(hasher),
+            inner: HashSet::with_hasher(hasher),
         }
     }
 
@@ -105,7 +104,7 @@ impl<K, V, S> ExtractMap<K, V, S> {
     #[must_use]
     pub fn with_capacity_and_hasher(capacity: usize, hasher: S) -> Self {
         Self {
-            inner: HashMap::with_capacity_and_hasher(capacity, hasher),
+            inner: HashSet::with_capacity_and_hasher(capacity, hasher),
         }
     }
 }
@@ -141,8 +140,10 @@ where
     ///
     /// assert_eq!(map.len(), 2);
     /// ```
-    pub fn insert(&mut self, value: V) {
-        self.inner.insert(ValueWrapper(value, PhantomData), ());
+    pub fn insert(&mut self, value: V) -> Option<V> {
+        self.inner
+            .replace(ValueWrapper(value, PhantomData))
+            .map(|v| v.0)
     }
 
     /// # Examples
@@ -169,7 +170,7 @@ where
     /// assert!(map.is_empty())
     /// ```
     pub fn remove(&mut self, key: &K) -> Option<V> {
-        self.inner.remove_entry(key).map(|(v, ())| v.0)
+        self.inner.take(key).map(|v| v.0)
     }
 
     /// Retrieves a value from the [`ExtractMap`].
@@ -177,7 +178,7 @@ where
     /// This will retrieve the value based on the key extracted using [`ExtractKey`].
     #[must_use]
     pub fn get(&self, key: &K) -> Option<&V> {
-        self.inner.get_key_value(key).map(|(v, ())| &v.0)
+        self.inner.get(key).map(|v| &v.0)
     }
 }
 
@@ -257,7 +258,7 @@ where
     fn from_iter<T: IntoIterator<Item = V>>(iter: T) -> Self {
         let inner = iter
             .into_iter()
-            .map(|item| (ValueWrapper(item, PhantomData), ()))
+            .map(|item| ValueWrapper(item, PhantomData))
             .collect();
 
         Self { inner }

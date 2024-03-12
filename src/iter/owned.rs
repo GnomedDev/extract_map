@@ -3,7 +3,7 @@ use std::iter::FusedIterator;
 use crate::{value_wrapper::ValueWrapper, ExtractMap};
 
 #[must_use = "Iterators do nothing if not consumed"]
-pub struct IntoIter<K, V>(hashbrown::hash_map::IntoKeys<ValueWrapper<K, V>, ()>);
+pub struct IntoIter<K, V>(std::collections::hash_set::IntoIter<ValueWrapper<K, V>>);
 
 impl<K, V> Iterator for IntoIter<K, V> {
     type Item = V;
@@ -30,6 +30,6 @@ impl<K, V, S> IntoIterator for ExtractMap<K, V, S> {
     type IntoIter = IntoIter<K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
-        IntoIter(self.inner.into_keys())
+        IntoIter(self.inner.into_iter())
     }
 }
