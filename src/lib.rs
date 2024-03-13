@@ -15,6 +15,9 @@ pub mod iter;
 mod mut_guard;
 mod value_wrapper;
 
+#[cfg(feature = "iter_mut")]
+pub use gat_lending_iterator::LendingIterator;
+
 pub trait ExtractKey<K> {
     fn extract_key(&self) -> &K;
 }
@@ -25,7 +28,7 @@ pub trait ExtractKey<K> {
 /// and is backed by a `HashSet<Wrap<K>, V, S>`, meaning this library only uses unsafe code
 /// for performance reasons.
 ///
-/// The default hashing algorithm is the same as the standard library's [`HashMap`], [`RandomState`],
+/// The default hashing algorithm is the same as the standard library's [`HashSet`], [`RandomState`],
 /// although your own hasher can be provided via [`ExtractMap::with_hasher`] and it's similar methods.
 #[cfg_attr(feature = "typesize", derive(typesize::TypeSize))]
 pub struct ExtractMap<K, V, S = RandomState> {
@@ -227,6 +230,25 @@ impl<K, V, S> ExtractMap<K, V, S> {
     /// Use [`IntoIterator::into_iter`] for an iterator over owned values.
     pub fn iter(&self) -> iter::Iter<'_, K, V> {
         self.into_iter()
+    }
+}
+
+#[cfg(feature = "iter_mut")]
+impl<K, V, S> ExtractMap<K, V, S>
+where
+    K: Hash + Eq + Clone,
+    V: ExtractKey<K>,
+    S: BuildHasher,
+{
+    /// Retrieves a [`LendingIterator`] over mutable borrowed values.
+    ///
+    /// This cannot implement [`Iterator`], so uses the `gat_lending_iterator` crate and has the
+    /// performance cost of allocating a [`Vec`] of the keys cloned, so if possible should be avoided.
+    ///
+    /// To use, [`LendingIterator`] must be in scope, therefore this crate re-exports it.
+    #[allow(clippy::iter_not_returning_iterator)]
+    pub fn iter_mut(&mut self) -> iter::IterMut<'_, K, V, S> {
+        iter::IterMut::new(self)
     }
 }
 
