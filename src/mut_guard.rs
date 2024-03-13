@@ -1,5 +1,6 @@
 use std::{
     hash::{BuildHasher, Hash},
+    mem::ManuallyDrop,
     ops::{Deref, DerefMut},
 };
 
@@ -11,7 +12,7 @@ where
     V: ExtractKey<K>,
     S: BuildHasher,
 {
-    pub(crate) value: Option<V>,
+    pub(crate) value: ManuallyDrop<V>,
     pub(crate) map: &'a mut ExtractMap<K, V, S>,
 }
 
@@ -22,7 +23,9 @@ where
     S: BuildHasher,
 {
     fn drop(&mut self) {
-        let value = self.value.take().unwrap();
+        // SAFETY: The ManuallyDrop is never used again as we are in Drop.
+        let value = unsafe { ManuallyDrop::take(&mut self.value) };
+
         self.map.insert(value);
     }
 }
@@ -36,7 +39,7 @@ where
     type Target = V;
 
     fn deref(&self) -> &Self::Target {
-        self.value.as_ref().unwrap()
+        &self.value
     }
 }
 
@@ -47,6 +50,6 @@ where
     S: BuildHasher,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        self.value.as_mut().unwrap()
+        &mut self.value
     }
 }

@@ -1,11 +1,11 @@
 #![warn(clippy::pedantic)]
-#![forbid(unsafe_code)]
 
 use std::{
     collections::HashSet,
     fmt::Debug,
     hash::{BuildHasher, Hash, RandomState},
     marker::PhantomData,
+    mem::ManuallyDrop,
 };
 
 use mut_guard::MutGuard;
@@ -22,7 +22,8 @@ pub trait ExtractKey<K> {
 /// A hash map for memory efficent storage of value types which contain their own keys.
 ///
 /// This is achieved by the `V` type deriving the [`ExtractKey`] trait for their `K` type,
-/// and is backed by a `HashSet<Wrap<K>, V, S>`, meaning this library is `#![forbid(unsafe_code)]`.
+/// and is backed by a `HashSet<Wrap<K>, V, S>`, meaning this library only uses unsafe code
+/// for performance reasons.
 ///
 /// The default hashing algorithm is the same as the standard library's [`HashMap`], [`RandomState`],
 /// although your own hasher can be provided via [`ExtractMap::with_hasher`] and it's similar methods.
@@ -197,7 +198,7 @@ where
     pub fn get_mut<'a>(&'a mut self, key: &K) -> Option<MutGuard<'a, K, V, S>> {
         let value = self.inner.take(key)?;
         Some(MutGuard {
-            value: Some(value.0),
+            value: ManuallyDrop::new(value.0),
             map: self,
         })
     }
