@@ -399,3 +399,19 @@ impl<K, V: serde::Serialize, H> serde::Serialize for ExtractMap<K, V, H> {
         serializer.collect_seq(self)
     }
 }
+
+/// A serialize method to serialize a [`ExtractMap`] to a map instead of a sequence.
+///
+/// This should be used via serde's `serialize_with` field attribute.
+///
+/// # Errors
+/// Errors if the underlying key or value serialisation fails.
+#[cfg(feature = "serde")]
+pub fn serialize_as_map<K, V, H, S>(map: &ExtractMap<K, V, H>, ser: S) -> Result<S::Ok, S::Error>
+where
+    K: serde::Serialize,
+    V: serde::Serialize + ExtractKey<K>,
+    S: serde::Serializer,
+{
+    ser.collect_map(map.iter().map(|v| (v.extract_key(), v)))
+}
