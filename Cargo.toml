@@ -6,10 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+gat-lending-iterator = { version = "0.1.5", optional = true }
 serde = { version = "1.0.197", optional = true }
 
 [features]
 serde = ["dep:serde"]
+iter_mut = ["dep:gat-lending-iterator"]
 
 [dev-dependencies]
 serde_json = { version = "1" }
