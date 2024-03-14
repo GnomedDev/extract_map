@@ -18,7 +18,12 @@ mod value_wrapper;
 #[cfg(feature = "iter_mut")]
 pub use gat_lending_iterator::LendingIterator;
 
-pub trait ExtractKey<K> {
+/// A trait for extracting the key for an [`ExtractMap`].
+///
+/// This is relied on for correctness in the same way as [`Hash`] and [`Eq`] are and
+/// is purely designed for directly referencing a field with no interior mutability or
+/// static return type, the documentation on [`HashSet`] should be followed for this key type.
+pub trait ExtractKey<K: Hash + Eq> {
     fn extract_key(&self) -> &K;
 }
 
@@ -261,7 +266,7 @@ impl<K, V: Clone, S: Clone> Clone for ExtractMap<K, V, S> {
 
 impl<K, V, S> Debug for ExtractMap<K, V, S>
 where
-    K: Debug,
+    K: Debug + Hash + Eq,
     V: Debug + ExtractKey<K>,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -295,7 +300,7 @@ where
 
 impl<K, V, S> FromIterator<V> for ExtractMap<K, V, S>
 where
-    K: Eq + Hash,
+    K: Hash + Eq,
     V: ExtractKey<K>,
     S: BuildHasher + Default,
 {
@@ -432,7 +437,7 @@ impl<K, V: serde::Serialize, H> serde::Serialize for ExtractMap<K, V, H> {
 #[cfg(feature = "serde")]
 pub fn serialize_as_map<K, V, H, S>(map: &ExtractMap<K, V, H>, ser: S) -> Result<S::Ok, S::Error>
 where
-    K: serde::Serialize,
+    K: serde::Serialize + Hash + Eq,
     V: serde::Serialize + ExtractKey<K>,
     S: serde::Serializer,
 {

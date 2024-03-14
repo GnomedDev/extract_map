@@ -6,6 +6,7 @@ pub(crate) struct ValueWrapper<K, V>(pub V, pub PhantomData<K>);
 
 impl<K, V> Borrow<K> for ValueWrapper<K, V>
 where
+    K: Hash + Eq,
     V: ExtractKey<K>,
 {
     fn borrow(&self) -> &K {
@@ -25,7 +26,7 @@ where
 
 impl<K, V> PartialEq for ValueWrapper<K, V>
 where
-    K: PartialEq,
+    K: Hash + Eq,
     V: ExtractKey<K>,
 {
     fn eq(&self, other: &Self) -> bool {
@@ -35,7 +36,7 @@ where
 
 impl<K, V> Eq for ValueWrapper<K, V>
 where
-    K: Eq,
+    K: Hash + Eq,
     V: ExtractKey<K>,
 {
 }
