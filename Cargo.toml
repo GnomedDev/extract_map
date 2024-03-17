@@ -2,6 +2,10 @@
 name = "extract_map"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+categories = ["data-structures"]
+repository = "https://github.com/GnomedDev/extract_map"
+description = "A HashMap for memory efficent storage of value types which contain their own keys."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
