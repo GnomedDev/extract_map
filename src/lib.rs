@@ -1,9 +1,14 @@
+//! See [`ExtractMap`] for the main documentation.
+//!
+//! ## MSRV
+//!
+//! The Minimum Supported Rust Version for this crate is 1.70, and raising it is considered a breaking change.
 #![warn(clippy::pedantic, rust_2018_idioms)]
 
 use std::{
-    collections::HashSet,
+    collections::{hash_map::RandomState, HashSet},
     fmt::Debug,
-    hash::{BuildHasher, Hash, RandomState},
+    hash::{BuildHasher, Hash},
     marker::PhantomData,
     mem::ManuallyDrop,
 };
@@ -94,6 +99,8 @@ impl<K, V, S> ExtractMap<K, V, S> {
     ///
     /// # Examples
     /// ```
+    /// use std::collections::hash_map::RandomState;
+    ///
     /// use extract_map::{ExtractMap, ExtractKey};
     ///
     /// struct User {
@@ -107,7 +114,7 @@ impl<K, V, S> ExtractMap<K, V, S> {
     ///     }
     /// }
     ///
-    /// let map = ExtractMap::<u64, User>::with_capacity_and_hasher(5, std::hash::RandomState::new());
+    /// let map = ExtractMap::<u64, User>::with_capacity_and_hasher(5, RandomState::new());
     ///
     /// assert!(map.is_empty());
     /// assert!(map.capacity() >= 5);
