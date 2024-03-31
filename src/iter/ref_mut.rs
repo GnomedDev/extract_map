@@ -13,6 +13,12 @@ pub struct IterMut<'a, K, V, S> {
     keys: VecDeque<K>,
 }
 
+impl<K, V: std::fmt::Debug, S> std::fmt::Debug for IterMut<'_, K, V, S> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_list().entries(self.map.iter()).finish()
+    }
+}
+
 impl<'a, K, V, S> IterMut<'a, K, V, S>
 where
     K: Hash + Eq + Clone,

@@ -5,6 +5,18 @@ use crate::{value_wrapper::ValueWrapper, ExtractMap};
 #[must_use = "Iterators do nothing if not consumed"]
 pub struct Iter<'a, K, V>(pub(crate) std::collections::hash_set::Iter<'a, ValueWrapper<K, V>>);
 
+impl<K, V> Clone for Iter<'_, K, V> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
+
+impl<K, V: std::fmt::Debug> std::fmt::Debug for Iter<'_, K, V> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Debug::fmt(&self.0, f)
+    }
+}
+
 impl<'a, K, V> Iterator for Iter<'a, K, V> {
     type Item = &'a V;
 

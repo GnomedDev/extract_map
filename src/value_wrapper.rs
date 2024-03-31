@@ -4,6 +4,12 @@ use crate::ExtractKey;
 
 pub(crate) struct ValueWrapper<K, V>(pub V, pub PhantomData<K>);
 
+impl<K, V: std::fmt::Debug> std::fmt::Debug for ValueWrapper<K, V> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Debug::fmt(&self.0, f)
+    }
+}
+
 impl<K, V> Borrow<K> for ValueWrapper<K, V>
 where
     K: Hash + Eq,
