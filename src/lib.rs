@@ -1,4 +1,4 @@
-#![warn(clippy::pedantic)]
+#![warn(clippy::pedantic, rust_2018_idioms)]
 
 use std::{
     collections::HashSet,
@@ -394,7 +394,7 @@ where
         {
             type Value = ExtractMap<K, V, S>;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 formatter.write_str("a sequence")
             }
 
