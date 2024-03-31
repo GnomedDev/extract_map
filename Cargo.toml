@@ -1,10 +1,11 @@
 [package]
 name = "extract_map"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "MIT"
 rust-version = "1.70"
 categories = ["data-structures"]
+keywords = ["hashmap", "hashset", "map", "memory", "optimised"]
 repository = "https://github.com/GnomedDev/extract_map"
 description = "A HashMap for memory efficent storage of value types which contain their own keys."
 
