@@ -3,7 +3,7 @@
 //! ## MSRV
 //!
 //! The Minimum Supported Rust Version for this crate is 1.70, and raising it is considered a breaking change.
-#![warn(clippy::pedantic, rust_2018_idioms)]
+#![warn(clippy::pedantic, rust_2018_idioms, missing_docs)]
 
 use std::{
     collections::{hash_map::RandomState, HashSet},
@@ -16,6 +16,7 @@ use std::{
 use mut_guard::MutGuard;
 use value_wrapper::ValueWrapper;
 
+#[doc(hidden)]
 pub mod iter;
 mod mut_guard;
 mod value_wrapper;
@@ -29,6 +30,7 @@ pub use gat_lending_iterator::LendingIterator;
 /// is purely designed for directly referencing a field with no interior mutability or
 /// static return type, the documentation on [`HashSet`] should be followed for this key type.
 pub trait ExtractKey<K: Hash + Eq> {
+    /// Extracts the key that this value should be referred to with.
     fn extract_key(&self) -> &K;
 }
 
@@ -220,16 +222,19 @@ where
 }
 
 impl<K, V, S> ExtractMap<K, V, S> {
+    /// Retrieves the number of remaining values that can be inserted before a reallocation.
     #[must_use]
     pub fn capacity(&self) -> usize {
         self.inner.capacity()
     }
 
+    /// Retrieves the number of values currently in the [`ExtractMap`].
     #[must_use]
     pub fn len(&self) -> usize {
         self.inner.len()
     }
 
+    /// Retrieves if the [`ExtractMap`] contains no values.
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.inner.is_empty()
