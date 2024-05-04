@@ -15,11 +15,13 @@ use std::{
 
 use mut_guard::MutGuard;
 use value_wrapper::ValueWrapper;
+use with_size_hint::IteratorExt as _;
 
 #[doc(hidden)]
 pub mod iter;
 mod mut_guard;
 mod value_wrapper;
+mod with_size_hint;
 
 #[cfg(feature = "iter_mut")]
 pub use gat_lending_iterator::LendingIterator;
@@ -392,13 +394,18 @@ where
             }
 
             fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<Self::Value, A::Error> {
+                let size_hint = map.size_hint();
                 std::iter::from_fn(|| map.next_entry::<IgnoredAny, V>().transpose())
                     .map(|res| res.map(|(_, v)| v))
+                    .with_size_hint(size_hint)
                     .collect()
             }
 
             fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
-                std::iter::from_fn(|| seq.next_element().transpose()).collect()
+                let size_hint = seq.size_hint();
+                std::iter::from_fn(|| seq.next_element().transpose())
+                    .with_size_hint(size_hint)
+                    .collect()
             }
         }
 
