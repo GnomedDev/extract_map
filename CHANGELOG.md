@@ -1,3 +1,7 @@
+## 0.1.2
+
+- Simplifed `serde::Deserialize` implementation for `ExtractMap`
+
 ## 0.1.1
 
 - Documented MSRV as 1.70
