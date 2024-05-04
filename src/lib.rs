@@ -375,26 +375,7 @@ where
     S: BuildHasher + Default,
 {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        use serde::de::{DeserializeSeed, Error, IgnoredAny, MapAccess, SeqAccess};
-
-        struct SeqMapAdapter<M>(M);
-
-        impl<'de, M, E> SeqAccess<'de> for SeqMapAdapter<M>
-        where
-            E: Error,
-            M: MapAccess<'de, Error = E>,
-        {
-            type Error = E;
-
-            fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
-            where
-                T: DeserializeSeed<'de>,
-            {
-                self.0
-                    .next_entry_seed(PhantomData::<IgnoredAny>, seed)
-                    .map(|o| o.map(|(_, v)| v))
-            }
-        }
+        use serde::de::{IgnoredAny, MapAccess, SeqAccess};
 
         struct Visitor<K, V, S>(PhantomData<(K, V, S)>);
 
@@ -410,21 +391,14 @@ where
                 formatter.write_str("a sequence")
             }
 
-            fn visit_map<A: MapAccess<'de>>(self, map: A) -> Result<Self::Value, A::Error> {
-                self.visit_seq(SeqMapAdapter(map))
+            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<Self::Value, A::Error> {
+                std::iter::from_fn(|| map.next_entry::<IgnoredAny, V>().transpose())
+                    .map(|res| res.map(|(_, v)| v))
+                    .collect()
             }
 
             fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
-                let mut map = ExtractMap::with_capacity_and_hasher(
-                    seq.size_hint().unwrap_or_default(),
-                    S::default(),
-                );
-
-                while let Some(elem) = seq.next_element()? {
-                    map.insert(elem);
-                }
-
-                Ok(map)
+                std::iter::from_fn(|| seq.next_element().transpose()).collect()
             }
         }
 
