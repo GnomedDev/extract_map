@@ -44,7 +44,6 @@ pub trait ExtractKey<K: Hash + Eq> {
 ///
 /// The default hashing algorithm is the same as the standard library's [`HashSet`], [`RandomState`],
 /// although your own hasher can be provided via [`ExtractMap::with_hasher`] and it's similar methods.
-#[cfg_attr(feature = "typesize", derive(typesize::TypeSize))]
 pub struct ExtractMap<K, V, S = RandomState> {
     inner: HashSet<ValueWrapper<K, V>, S>,
 }
