@@ -12,6 +12,7 @@ description = "A HashMap for memory efficent storage of value types which contai
 [dependencies]
 typesize = { version = "0.1.9", optional = true, default-features = false }
 gat-lending-iterator = { version = "0.1.5", optional = true }
+hashbrown = { version = "0.14.5", default-features = false }
 serde = { version = "1.0.197", optional = true }
 
 [features]
