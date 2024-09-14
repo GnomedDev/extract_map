@@ -10,11 +10,13 @@ repository = "https://github.com/GnomedDev/extract_map"
 description = "A HashMap for memory efficent storage of value types which contain their own keys."
 
 [dependencies]
+typesize = { version = "0.1.9", optional = true, default-features = false }
 gat-lending-iterator = { version = "0.1.5", optional = true }
 serde = { version = "1.0.197", optional = true }
 
 [features]
 serde = ["dep:serde"]
+typesize = ["dep:typesize"]
 iter_mut = ["dep:gat-lending-iterator"]
 
 [dev-dependencies]
