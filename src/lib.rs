@@ -15,11 +15,13 @@ use std::{
 
 use hashbrown::{hash_table::Entry, HashTable};
 use mut_guard::MutGuard;
+#[cfg(feature = "serde")]
 use with_size_hint::IteratorExt as _;
 
 #[doc(hidden)]
 pub mod iter;
 mod mut_guard;
+#[cfg(feature = "serde")]
 mod with_size_hint;
 
 #[cfg(feature = "iter_mut")]
