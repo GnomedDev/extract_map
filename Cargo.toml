@@ -10,7 +10,8 @@ repository = "https://github.com/GnomedDev/extract_map"
 description = "A HashMap for memory efficent storage of value types which contain their own keys."
 
 [dependencies]
-gat-lending-iterator = { version = "0.1.5", optional = true }
+gat-lending-iterator = { version = "0.1.6", optional = true }
+hashbrown = { version = "0.15.0", default-features = false }
 serde = { version = "1.0.197", optional = true }
 
 [features]
