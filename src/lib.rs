@@ -58,7 +58,7 @@ pub struct ExtractMap<K, V, S = RandomState> {
     build_hasher: S,
 }
 
-impl<K, V, S> Default for ExtractMap<K, V, S> where S:Default{
+impl<K, V, S: Default> Default for ExtractMap<K, V, S> {
     fn default() -> Self {
         Self::with_hasher(S::default())
     }
