@@ -21,6 +21,8 @@ pub mod iter;
 mod mut_guard;
 #[cfg(feature = "serde")]
 mod serde;
+#[cfg(feature = "typesize")]
+mod typesize;
 
 #[cfg(feature = "iter_mut")]
 pub use gat_lending_iterator::LendingIterator;
@@ -53,6 +55,7 @@ pub trait ExtractKey<K: Hash + Eq> {
 /// [`HashSet`]: std::collections::HashSet
 /// [`HashMap`]: std::collections::HashMap
 pub struct ExtractMap<K, V, S = RandomState> {
+    // Any new fields added should be added to the `typesize` impl
     table: hashbrown::HashTable<V>,
     phantom: PhantomData<K>,
     build_hasher: S,

@@ -13,10 +13,14 @@ description = "A HashMap for memory efficent storage of value types which contai
 gat-lending-iterator = { version = "0.1.6", optional = true }
 hashbrown = { version = "0.15.2", default-features = false }
 serde = { version = "1.0.197", optional = true }
+typesize = { version = "0.1.13", default-features = false, optional = true, features = [
+    "hashbrown_15",
+] }
 
 [features]
 serde = ["dep:serde"]
 iter_mut = ["dep:gat-lending-iterator"]
+typesize = ["dep:typesize"]
 
 [dev-dependencies]
 serde_json = { version = "1.0.115" }
