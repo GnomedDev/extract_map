@@ -273,6 +273,14 @@ impl<K, V, S> ExtractMap<K, V, S> {
         self.table.is_empty()
     }
 
+    /// Returns the total amount of memory allocated internally, in bytes.
+    ///
+    /// The returned number is informational only. It is intended to be
+    /// primarily used for memory profiling.
+    pub fn allocation_size(&self) -> usize {
+        self.table.allocation_size()
+    }
+
     /// Retrieves an iterator over the borrowed values.
     ///
     /// If you need an iterator over the keys and values, simply use [`ExtractKey`].
