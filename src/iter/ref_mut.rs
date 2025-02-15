@@ -31,13 +31,16 @@ where
     }
 }
 
-impl<'map, K, V, S> LendingIterator for IterMut<'map, K, V, S>
+impl<K, V, S> LendingIterator for IterMut<'_, K, V, S>
 where
     K: Hash + Eq,
     V: ExtractKey<K>,
     S: BuildHasher,
 {
-    type Item<'item> = MutGuard<'item, K, V, S> where Self: 'item;
+    type Item<'item>
+        = MutGuard<'item, K, V, S>
+    where
+        Self: 'item;
 
     fn next(&mut self) -> Option<Self::Item<'_>> {
         let key = self.keys.pop_front()?;
