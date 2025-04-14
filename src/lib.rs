@@ -321,6 +321,11 @@ impl<K, V: Clone, S: Clone> Clone for ExtractMap<K, V, S> {
             phantom: PhantomData,
         }
     }
+
+    fn clone_from(&mut self, source: &Self) {
+        self.table.clone_from(&source.table);
+        self.build_hasher.clone_from(&source.build_hasher);
+    }
 }
 
 impl<K, V, S> Debug for ExtractMap<K, V, S>

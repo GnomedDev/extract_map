@@ -9,6 +9,10 @@ impl<V> Clone for Iter<'_, V> {
     fn clone(&self) -> Self {
         Self(self.0.clone())
     }
+
+    fn clone_from(&mut self, source: &Self) {
+        self.0.clone_from(&source.0);
+    }
 }
 
 impl<V: std::fmt::Debug> std::fmt::Debug for Iter<'_, V> {
