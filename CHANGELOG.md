@@ -1,3 +1,9 @@
+## 0.2.1
+
+### Added
+
+- `ExtractMap::clone_from` is now implemented manually, making it more efficent.
+
 ## 0.2.0
 
 ### Breaking
