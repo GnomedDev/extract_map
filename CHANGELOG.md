@@ -1,3 +1,9 @@
+## 0.2.2
+
+### Added
+
+- `ExtractMap::entry` has been implemented, allowing for usage of the Entry API.
+
 ## 0.2.1
 
 ### Added
