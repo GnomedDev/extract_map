@@ -39,18 +39,7 @@ impl<Item, I: Iterator<Item = Item>> IteratorExt for I {
 /// # Example
 /// ```
 /// use extract_map::{ExtractMap, ExtractKey};
-///
-/// #[derive(Debug, PartialEq, serde::Deserialize)]
-/// struct User {
-///     id: u64,
-///     name: &'static str,
-/// }
-///
-/// impl ExtractKey<u64> for User {
-///     fn extract_key(&self) -> &u64 {
-///         &self.id
-///     }
-/// }
+/// # use extract_map::doc_examples::User;
 ///
 /// let map_json = r#"{"0": {"id": 0, "name": "Elliott"}, "1": {"id": 1, "name": "Daisy"}}"#;
 /// let seq_json = r#"[{"id": 0, "name": "Elliott"}, {"id": 1, "name": "Daisy"}]"#;

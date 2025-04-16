@@ -13,9 +13,12 @@ use std::{
     mem::{replace, ManuallyDrop},
 };
 
-use hashbrown::{hash_table::Entry, HashTable};
+use hashbrown::{hash_table::Entry as RawEntry, HashTable};
 use mut_guard::MutGuard;
 
+#[doc(hidden)]
+pub mod doc_examples;
+pub mod entry;
 #[doc(hidden)]
 pub mod iter;
 mod mut_guard;
@@ -79,17 +82,7 @@ impl<K, V> ExtractMap<K, V, RandomState> {
     /// # Examples
     /// ```
     /// use extract_map::{ExtractMap, ExtractKey};
-    ///
-    /// struct User {
-    ///     id: u64,
-    ///     name: &'static str,
-    /// }
-    ///
-    /// impl ExtractKey<u64> for User {
-    ///     fn extract_key(&self) -> &u64 {
-    ///         &self.id
-    ///     }
-    /// }
+    /// # use extract_map::doc_examples::User;
     ///
     /// let map = ExtractMap::<u64, User>::with_capacity(5);
     ///
@@ -120,17 +113,7 @@ impl<K, V, S> ExtractMap<K, V, S> {
     /// use std::collections::hash_map::RandomState;
     ///
     /// use extract_map::{ExtractMap, ExtractKey};
-    ///
-    /// struct User {
-    ///     id: u64,
-    ///     name: &'static str,
-    /// }
-    ///
-    /// impl ExtractKey<u64> for User {
-    ///     fn extract_key(&self) -> &u64 {
-    ///         &self.id
-    ///     }
-    /// }
+    /// # use extract_map::doc_examples::User;
     ///
     /// let map = ExtractMap::<u64, User>::with_capacity_and_hasher(5, RandomState::new());
     ///
@@ -153,6 +136,14 @@ where
     V: ExtractKey<K>,
     S: BuildHasher,
 {
+    fn raw_entry(&mut self, key: &K) -> RawEntry<'_, V> {
+        self.table.entry(
+            hash_one(&self.build_hasher, key),
+            |v| key == v.extract_key(),
+            |v| hash_one(&self.build_hasher, v.extract_key()),
+        )
+    }
+
     /// Inserts a value into the [`ExtractMap`].
     ///
     /// This extracts the key from the value using the [`ExtractKey`] trait, and therefore does not need a key to be provided.
@@ -160,17 +151,7 @@ where
     /// # Examples
     /// ```
     /// use extract_map::{ExtractMap, ExtractKey};
-    ///
-    /// struct User {
-    ///     id: u64,
-    ///     name: &'static str,
-    /// }
-    ///
-    /// impl ExtractKey<u64> for User {
-    ///     fn extract_key(&self) -> &u64 {
-    ///         &self.id
-    ///     }
-    /// }
+    /// # use extract_map::doc_examples::User;
     ///
     /// let mut map = ExtractMap::new();
     /// map.insert(User { id: 1, name: "Daisy" });
@@ -179,16 +160,9 @@ where
     /// assert_eq!(map.len(), 2);
     /// ```
     pub fn insert(&mut self, value: V) -> Option<V> {
-        let key = value.extract_key();
-        let entry = self.table.entry(
-            hash_one(&self.build_hasher, key),
-            |v| key == v.extract_key(),
-            |v| hash_one(&self.build_hasher, v.extract_key()),
-        );
-
-        match entry {
-            Entry::Occupied(entry) => Some(replace(entry.into_mut(), value)),
-            Entry::Vacant(entry) => {
+        match self.raw_entry(value.extract_key()) {
+            RawEntry::Occupied(entry) => Some(replace(entry.into_mut(), value)),
+            RawEntry::Vacant(entry) => {
                 entry.insert(value);
                 None
             }
@@ -200,18 +174,7 @@ where
     /// # Examples
     /// ```
     /// use extract_map::{ExtractMap, ExtractKey};
-    ///
-    /// #[derive(Debug, Clone, PartialEq)]
-    /// struct User {
-    ///     id: u64,
-    ///     name: &'static str,
-    /// }
-    ///
-    /// impl ExtractKey<u64> for User {
-    ///     fn extract_key(&self) -> &u64 {
-    ///         &self.id
-    ///     }
-    /// }
+    /// # use extract_map::doc_examples::User;
     ///
     /// let user = User { id: 1, name: "Daisy" };
     /// let mut map = ExtractMap::new();
