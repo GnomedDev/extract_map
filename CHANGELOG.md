@@ -1,3 +1,9 @@
+## 0.3.0
+
+### Breaking
+
+- `ExtractMap::iter_mut` is now based on normal iterators, instead of `LendingIterator`.
+
 ## 0.2.2
 
 ### Added
