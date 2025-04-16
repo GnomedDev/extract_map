@@ -1,6 +1,6 @@
 [package]
 name = "extract_map"
-version = "0.2.2"
+version = "0.3.0"
 edition = "2021"
 license = "MIT"
 rust-version = "1.70"
@@ -10,7 +10,6 @@ repository = "https://github.com/GnomedDev/extract_map"
 description = "A HashMap for memory efficent storage of value types which contain their own keys."
 
 [dependencies]
-gat-lending-iterator = { version = "0.1.6", optional = true }
 hashbrown = { version = "0.15.2", default-features = false }
 serde = { version = "1.0.197", optional = true }
 typesize = { version = "0.1.13", default-features = false, optional = true, features = [
@@ -19,7 +18,6 @@ typesize = { version = "0.1.13", default-features = false, optional = true, feat
 
 [features]
 serde = ["dep:serde"]
-iter_mut = ["dep:gat-lending-iterator"]
 typesize = ["dep:typesize"]
 
 [dev-dependencies]

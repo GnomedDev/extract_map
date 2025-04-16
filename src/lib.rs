@@ -27,8 +27,6 @@ mod serde;
 #[cfg(feature = "typesize")]
 mod typesize;
 
-#[cfg(feature = "iter_mut")]
-pub use gat_lending_iterator::LendingIterator;
 #[cfg(feature = "serde")]
 pub use serde::serialize_as_map;
 
@@ -255,24 +253,14 @@ impl<K, V, S> ExtractMap<K, V, S> {
     pub fn iter(&self) -> iter::Iter<'_, V> {
         self.into_iter()
     }
-}
 
-#[cfg(feature = "iter_mut")]
-impl<K, V, S> ExtractMap<K, V, S>
-where
-    K: Hash + Eq + Clone,
-    V: ExtractKey<K>,
-    S: BuildHasher,
-{
-    /// Retrieves a [`LendingIterator`] over mutable borrowed values.
+    /// Retrieves a iterator over mutable borrowed values.
     ///
-    /// This cannot implement [`Iterator`], so uses the `gat_lending_iterator` crate and has the
-    /// performance cost of allocating a [`Vec`] of the keys cloned, so if possible should be avoided.
+    /// If you need an iterator over the keys and values, simply use [`ExtractKey`], but do not mutate the key.
     ///
-    /// To use, [`LendingIterator`] must be in scope, therefore this crate re-exports it.
-    #[allow(clippy::iter_not_returning_iterator)]
-    pub fn iter_mut(&mut self) -> iter::IterMut<'_, K, V, S> {
-        iter::IterMut::new(self)
+    /// Use [`IntoIterator::into_iter`] for an iterator over owned values.
+    pub fn iter_mut(&mut self) -> iter::IterMut<'_, V> {
+        self.into_iter()
     }
 }
 
