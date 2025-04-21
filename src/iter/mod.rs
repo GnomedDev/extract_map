@@ -59,6 +59,16 @@ forward_iterator!(
     |map: &'a ExtractMap<K, V, S>| map.table.iter()
 );
 
+impl<V> Clone for Iter<'_, V> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+
+    fn clone_from(&mut self, source: &Self) {
+        self.0.clone_from(&source.0);
+    }
+}
+
 forward_iterator!(
     pub struct IterMut<'a, V>(hashbrown::hash_table::IterMut<'a, V>),
     &'a mut V,
