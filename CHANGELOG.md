@@ -1,3 +1,9 @@
+## 0.3.1
+
+### Added
+
+- The iterator returned from `ExtractMap::iter` is now clonable.
+
 ## 0.3.0
 
 ### Breaking
